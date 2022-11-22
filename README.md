@@ -37,7 +37,7 @@ composer require yc-hwc/laravel-akulaku
                 ->fullUrl()
         ];
 ````
-#### [获取订单列表](https://developer.akulaku.com/documentation?filename=order%2Forder-list.md)
+#### [订单列表](https://developer.akulaku.com/documentation?filename=order%2Forder-list.md)
 ````
 $config = [
     'akulakuUrl'  => '',
