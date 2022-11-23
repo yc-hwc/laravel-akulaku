@@ -25,7 +25,7 @@ composer require yc-hwc/laravel-akulaku
     $config = [
         'akulakuUrl' => '',
     ];
-    $akulakuSDK = AkulakuSDK::config($config);
+    $akulakuSDK = \PHPAkulaku\AkulakuSDK::config($config);
 
     return ['redirectUrl' => $akulakuSDK->shopAuth()
         ->api('login')
