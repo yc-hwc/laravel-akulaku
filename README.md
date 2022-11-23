@@ -18,7 +18,7 @@ composer require yc-hwc/laravel-akulaku
         'privateKey'  => '',
     ];
     
-    $tiktokSDK = \PHPAkulaku\AkulakuSDK::config($config);
+    $akulakuSDK = \PHPAkulaku\AkulakuSDK::config($config);
 ````
 #### [店铺授权](https://developer.akulaku.com/documentation?filename=overview%2Fopen-api-authentication.md)
 ````
