@@ -1,14 +1,14 @@
 <?php
 
-
 namespace PHPAkulaku\V1;
 
-
-use PHPAkulaku\V1\Traits\ShopApi;
+use PHPAkulaku\V1\Traits\Api;
 
 class Category extends AkulakuResource
 {
-    use ShopApi;
 
-    protected $parentResource = '/api/open';
+    use Api;
+
+    protected $parentResource = '/v1/open/goods/category';
 }
+

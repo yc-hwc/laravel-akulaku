@@ -3,12 +3,13 @@
 
 namespace PHPAkulaku\V1;
 
-
-use PHPAkulaku\V1\Traits\ShopApi;
+use PHPAkulaku\V1\Traits\Api;
 
 class Goods extends AkulakuResource
 {
-    use ShopApi;
+
+    use Api;
 
     protected $parentResource = '/v1/open/goods';
 }
+

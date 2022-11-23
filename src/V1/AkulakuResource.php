@@ -1,11 +1,14 @@
 <?php
 
+
+
 namespace PHPAkulaku\V1;
 
 use PHPAkulaku\AkulakuSDK;
 
 abstract class AkulakuResource
 {
+
     protected $parentResource;
 
     protected $childResources;
@@ -24,6 +27,7 @@ abstract class AkulakuResource
      * @param $resourceName
      * @return static
      */
+
     public function __get($resourceName)
     {
         return $this->$resourceName();
@@ -34,7 +38,7 @@ abstract class AkulakuResource
      * @DateTime: 2022/11/22 10:20
      * @param $resourceName
      * @param $arguments
-     * @return $this
+     * @return static
      */
     public function __call($resourceName, $arguments)
     {
@@ -55,3 +59,4 @@ abstract class AkulakuResource
 
     public abstract function setHttpClient();
 }
+

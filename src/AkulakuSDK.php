@@ -1,61 +1,52 @@
 <?php
 
+
 namespace PHPAkulaku;
 
 use PHPAkulaku\Exception\SdkException;
-use PHPAkulaku\V1\{Shop,Token, Oauth, Seller,Reverse,GlobalProduct,Product,Order,Logistics,Category,Goods};
+use PHPAkulaku\V1\{AppControl, ShopAuth, Category, Goods, Logistics, Oauth, Order, Shop};
 
 /**
- * @property-read Seller $seller
- * @property-read Shop $shop
- * @property-read Oauth $oauth
- * @property-read Token $token
- * @property-read Reverse $reverse
- * @property-read GlobalProduct $globalProduct
- * @property-read Product $product
- * @property-read Order $order
+ * @property-read AppControl $appControl
+ * @property-read ShopAuth $shopAuth
+ * @property-read Category $category
+ * @property-read Goods $goods
  * @property-read Logistics $logistics
- * @property-read Category $finance
- * @property-read Goods $fulfillment
- *
- * @method Shop shop()
- * @method Token token()
- * @method Oauth oauth()
- * @method Reverse reverse()
- * @method GlobalProduct globalProduct()
- * @method Product product()
- * @method Order order()
+ * @property-read Oauth $oauth
+ * @property-read Order $order
+ * @property-read Shop $shop
+ * @method AppControl appControl()
+ * @method ShopAuth shopAuth()
+ * @method Category category()
+ * @method Goods goods()
  * @method Logistics logistics()
- * @method Category finance()
- * @method Goods fulfillment()
- * @method Seller seller()
+ * @method Oauth oauth()
+ * @method Order order()
+ * @method Shop shop()
  */
+
 class AkulakuSDK
 {
 
     protected $defaultApiVersion = 'V1';
 
     protected $resources = [
-        'shop',
-        'token',
-        'oauth',
-        'reverse',
-        'globalProduct',
-        'product',
-        'order',
+        'appControl',
+        'shopAuth',
+        'category',
+        'goods',
         'logistics',
-        'finance',
-        'fulfillment',
-        'seller'
+        'oauth',
+        'order',
+        'shop',
     ];
 
     public $config = [
-        'tiktokUrl'   => '',
-        'appKey'      => '',
-        'appSecret'   => '',
-        'apiVersion'  => '',
+        'akulakuUrl'  => '',
+        'appId'       => '',
         'accessToken' => '',
-        'shopId'      => '',
+        'privateKey'  => '',
+        'apiVersion'  => '',
     ];
 
     public function __construct($config)
@@ -79,9 +70,7 @@ class AkulakuSDK
         }
 
         $resourceClassName = __NAMESPACE__ . "\\" . $this->defaultApiVersion . "\\" . \ucfirst($resourceName);
-
         $resource = new $resourceClassName($this);
-
         return $resource;
     }
 
@@ -96,3 +85,4 @@ class AkulakuSDK
         return new AkulakuSDK($config);
     }
 }
+

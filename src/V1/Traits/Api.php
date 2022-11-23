@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 
 trait Api
 {
+
     public $url;
 
     public $uri;
@@ -17,7 +18,7 @@ trait Api
 
     protected $queryString = [];
 
-    protected $commonQueryString = [];
+    protected $commonHeaders = [];
 
     protected $timestamp;
 
@@ -44,7 +45,7 @@ trait Api
         'verify' => false
     ];
 
-    protected $tiktokSDK;
+    protected $akulakuSDK;
 
     /**
      * @Author: hwj
@@ -199,11 +200,12 @@ trait Api
      * @Author: hwj
      * @DateTime: 2022/4/20 17:49
      * @return array|mixed
-     * @throws RequestException\
+     * @throws RequestException
      */
     public function run()
     {
         $resource = $this->fullUrl();
+
         $response = match ($this->requestMethod) {
             'get'  => $this->httpClient()->get($resource),
             'post' => $this->httpClient()->post($resource),
@@ -241,7 +243,7 @@ trait Api
         return $this->fullUrl = sprintf('%s%s?%s', ...[
             $this->url,
             $this->uri,
-            http_build_query(array_merge($this->queryString?? [], $this->commonQueryString))
+            http_build_query($this->queryString?? [])
         ]);
     }
 
@@ -253,50 +255,42 @@ trait Api
     protected function generateUrl()
     {
         $this->uri = strpos($this->childResources, '/') === 0? $this->childResources: $this->parentResource . '/' . $this->childResources;
-        $this->url = $this->tiktokSDK->config['tiktokUrl'];
+        $this->url = $this->akulakuSDK->config['akulakuUrl'];
         $this->timestamp = time();
-        $this->setApiCommonParameters();
+        $this->setApiCommonHeaders();
         return $this;
     }
 
     /**
-     * 设置api公共参数
+     * 设置api公共请求头
      * @Author: hwj
      * @DateTime: 2022/4/23 11:22
      */
-    protected function setApiCommonParameters()
+    protected function setApiCommonHeaders()
     {
-        $tiktokSDK = &$this->tiktokSDK;
+        $akulakuSDK = &$this->akulakuSDK;
 
-        $signArr = array_filter(array_merge($this->queryString, [
-            'app_key'   => $tiktokSDK->config['appKey'],
+        $signArr = [
+            'app-id'    => $akulakuSDK->config['appId'],
             'timestamp' => $this->timestamp,
-            'shop_id'   => $tiktokSDK->config['shopId'],
-        ]));
+        ];
 
-        uksort($signArr, 'strcmp');
+        uksort($this->queryString, 'strcmp');
 
-        $signStr = sprintf('%s%s%s%s', ...[
-            $tiktokSDK->config['appSecret'],
-            $this->uri,
-            (function ($signArr) {
-                $signStr = '';
-                foreach ($signArr as $key => &$val) {
-                    $signStr .= $key . $val;
-                }
-
-                return $signStr;
-            })($signArr),
-            $tiktokSDK->config['appSecret']
+        $signStr = sprintf('%s%s&%s', ...[
+            http_build_query($signArr),
+            $this->queryString? http_build_query($this->queryString): '',
+            is_array($this->body)? json_encode($this->body): ''
         ]);
 
-        $this->commonQueryString = array_filter([
-            'app_key'      => $tiktokSDK->config['appKey'],
+        $this->commonHeaders = [
+            'app-id'       => $akulakuSDK->config['appId'],
+            'access-token' => $akulakuSDK->config['accessToken'],
+            'sign'         => $this->generateSign($signStr, $akulakuSDK->config['privateKey']),
             'timestamp'    => $this->timestamp,
-            'access_token' => $tiktokSDK->config['accessToken'],
-            'shop_id'      => $tiktokSDK->config['shopId'],
-            'sign'         => $this->generateSign($signStr, $tiktokSDK->config['appSecret']),
-        ]);
+        ];
+
+        $this->withHeaders(array_merge($this->headers, $this->commonHeaders));
     }
 
     /**
@@ -307,8 +301,16 @@ trait Api
      * @param $key
      * @return string
      */
-    protected function generateSign($had, $key)
+    protected function generateSign($had, $privateKey)
     {
-        return bin2hex(hash_hmac('sha256', $had, $key,true));
+        $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
+            wordwrap($privateKey, 64, "\n", true) .
+            "\n-----END RSA PRIVATE KEY-----";
+        $key = openssl_get_privatekey($privateKey);
+        openssl_sign(base64_encode($had), $signature, $key, 'sha256WithRSAEncryption');
+        openssl_free_key($key);
+        $sign = base64_encode($signature);
+        return $sign;
     }
 }
+
